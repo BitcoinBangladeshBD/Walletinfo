@@ -1,156 +1,192 @@
 <!doctype html>
-
 <html lang="en">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>WalletInfo ℹ️ — ETH & Base wallet viewer</title>
-  <meta name="description" content="Check ETH + stablecoins, ENS, Twitter, Arkham link, top tokens, pie chart, dark/light mode — mobile friendly single-file app." />  <script src="https://cdn.jsdelivr.net/npm/ethers@6.6.6/dist/ethers.umd.min.js"></script>  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.3.0/dist/chart.umd.min.js"></script>  <style>
-    :root{--bg:#0f1724;--card:#0b1220;--muted:#9aa4b2;--accent:#7c3aed;--glass:rgba(255,255,255,0.04)}
-    [data-theme='light']{--bg:#f8f9fa;--card:#ffffff;--muted:#6c757d;--accent:#7c3aed;--glass:rgba(0,0,0,0.03);color:#212529}
-    *{box-sizing:border-box}
-    body{margin:0;font-family:Inter,system-ui,Segoe UI,Roboto,'Helvetica Neue',Arial;color:#e6eef6;background:var(--bg);min-height:100vh;transition:background 0.3s,color 0.3s}
-    .wrap{max-width:980px;margin:28px auto;padding:20px}
-    header{display:flex;align-items:center;gap:12px;margin-bottom:14px}
-    .logo{width:56px;height:56px;border-radius:12px;background:linear-gradient(135deg,var(--accent),#06b6d4);display:flex;align-items:center;justify-content:center;color:white;font-weight:700;box-shadow:0 6px 20px rgba(124,58,237,0.18)}
-    h1{margin:0;font-size:20px}
-    p.lead{margin:4px 0 0 0;color:var(--muted);font-size:13px}
-    .theme-toggle{margin-left:auto;cursor:pointer;padding:6px 12px;border-radius:8px;border:1px solid var(--glass);background:var(--glass);color:inherit;font-weight:600}
-
-    .card{background:var(--card);border-radius:14px;padding:16px;box-shadow:0 6px 18px rgba(2,6,23,0.6);border:1px solid rgba(255,255,255,0.03);transition:background 0.3s,color 0.3s}
-    form.controls{display:flex;gap:12px;margin-top:14px;flex-wrap:wrap}
-    input[type=text],select{background:var(--glass);border:1px solid rgba(255,255,255,0.03);padding:12px 14px;border-radius:10px;color:inherit;min-width:0}
-    button.primary{background:linear-gradient(90deg,var(--accent),#06b6d4);border:none;padding:12px 16px;border-radius:10px;color:white;font-weight:600;cursor:pointer}
-    .small{font-size:13px;color:var(--muted)}
-
-    .grid{display:grid;grid-template-columns:1fr 360px;gap:16px;margin-top:16px}
-    @media (max-width:900px){.grid{grid-template-columns:1fr}}
-    .metric{display:flex;align-items:center;justify-content:space-between;gap:8px}
-    .big{font-size:20px;font-weight:700}
-    .sub{color:var(--muted);font-size:13px}
-    .list{margin-top:12px}
-    .list li{display:flex;justify-content:space-between;padding:10px;border-radius:8px;background:rgba(255,255,255,0.01);margin-bottom:8px;transition:background 0.3s}
-    .rightcol{position:sticky;top:20px;height:max-content}
-    .chip{display:inline-flex;align-items:center;gap:8px;padding:6px 10px;border-radius:999px;background:var(--glass);border:1px solid rgba(255,255,255,0.03);font-weight:600}
-    .muted{color:var(--muted)}
-    .link{color:#bfe9ff;text-decoration:none}
-    footer.small{margin-top:18px;color:var(--muted);font-size:13px}
-    .loading{display:inline-block;transform:translateY(2px)}
-    .bar{height:10px;background:rgba(255,255,255,0.03);border-radius:999px;overflow:hidden}
-    .bar > i{display:block;height:100%;width:0;background:linear-gradient(90deg,var(--accent),#06b6d4);transition:width 600ms ease}
-    .notice{background:linear-gradient(90deg, rgba(124,58,237,0.06), rgba(6,182,212,0.03));padding:10px;border-radius:10px;border:1px solid rgba(255,255,255,0.02);color:var(--muted);font-size:14px}
-    canvas{margin-top:16px;border-radius:12px;background:var(--card);}
-  </style></head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>WalletInfo ℹ️ — Full Dynamic</title>
+<script src="https://cdn.jsdelivr.net/npm/ethers@6.6.6/dist/ethers.umd.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.3.0/dist/chart.umd.min.js"></script>
+<style>
+:root{--bg:#0f1724;--card:#0b1220;--muted:#9aa4b2;--accent:#7c3aed;--glass:rgba(255,255,255,0.04)}
+[data-theme='light']{--bg:#f8f9fa;--card:#ffffff;--muted:#6c757d;--accent:#7c3aed;--glass:rgba(0,0,0,0.03);color:#212529}
+*{box-sizing:border-box}
+body{margin:0;font-family:Inter,system-ui,Segoe UI,Roboto,'Helvetica Neue',Arial;color:#e6eef6;background:var(--bg);min-height:100vh;transition:background 0.3s,color 0.3s}
+.wrap{max-width:980px;margin:28px auto;padding:20px}
+header{display:flex;align-items:center;gap:12px;margin-bottom:14px}
+.logo{width:56px;height:56px;border-radius:12px;background:linear-gradient(135deg,var(--accent),#06b6d4);display:flex;align-items:center;justify-content:center;color:white;font-weight:700;box-shadow:0 6px 20px rgba(124,58,237,0.18)}
+h1{margin:0;font-size:20px}
+p.lead{margin:4px 0 0 0;color:var(--muted);font-size:13px}
+.theme-toggle{margin-left:auto;cursor:pointer;padding:6px 12px;border-radius:8px;border:1px solid var(--glass);background:var(--glass);color:inherit;font-weight:600}
+.card{background:var(--card);border-radius:14px;padding:16px;box-shadow:0 6px 18px rgba(2,6,23,0.6);border:1px solid rgba(255,255,255,0.03);transition:background 0.3s,color 0.3s}
+form.controls{display:flex;gap:12px;margin-top:14px;flex-wrap:wrap}
+input[type=text],select{background:var(--glass);border:1px solid rgba(255,255,255,0.03);padding:12px 14px;border-radius:10px;color:inherit;min-width:0}
+button.primary{background:linear-gradient(90deg,var(--accent),#06b6d4);border:none;padding:12px 16px;border-radius:10px;color:white;font-weight:600;cursor:pointer}
+.small{font-size:13px;color:var(--muted)}
+.grid{display:grid;grid-template-columns:1fr 360px;gap:16px;margin-top:16px}
+@media (max-width:900px){.grid{grid-template-columns:1fr}}
+.metric{display:flex;align-items:center;justify-content:space-between;gap:8px}
+.big{font-size:20px;font-weight:700}
+.sub{color:var(--muted);font-size:13px}
+.list{margin-top:12px}
+.list li{display:flex;justify-content:space-between;padding:10px;border-radius:8px;background:rgba(255,255,255,0.01);margin-bottom:8px;transition:background 0.3s}
+canvas{margin-top:16px;border-radius:12px;background:var(--card);}
+</style>
+</head>
 <body data-theme="dark">
-  <div class="wrap">
-    <header>
-      <div class="logo">ℹ️</div>
-      <div>
-        <h1>WalletInfo ℹ️</h1>
-        <p class="lead">ETH & stablecoins, ENS, Twitter, Arkham link + Top Tokens with Pie Chart</p>
-      </div>
-      <div class="theme-toggle" onclick="toggleTheme()">🌞/🌙</div>
-    </header><div class="card">
-  <form id="form" class="controls" onsubmit="return false;">
-    <input id="addr" type="text" placeholder="Enter wallet address (0x...) or ENS" aria-label="address" style="flex:1" />
-    <select id="chain" style="width:160px">
-      <option value="ethereum">Ethereum</option>
-      <option value="base">Base</option>
-    </select>
-    <button id="btn" class="primary">Check Wallet</button>
-  </form>
+<div class="wrap">
+<header>
+<div class="logo">ℹ️</div>
+<div>
+<h1>WalletInfo ℹ️</h1>
+<p class="lead">Dynamic Wallet Viewer (ETH/Base/Polygon/Arbitrum)</p>
+</div>
+<div class="theme-toggle" onclick="toggleTheme()">🌞/🌙</div>
+</header>
 
-  <div class="grid">
-    <div>
-      <div id="summary" class="card" style="margin-top:14px;">
-        <div class="metric">
-          <div>
-            <div class="small muted">Portfolio (approx)</div>
-            <div class="big" id="pv">—</div>
-          </div>
-          <div style="text-align:right">
-            <div class="sub" id="addr_short">—</div>
-            <div class="chip" id="ens_chip" style="display:none">ENS</div>
-          </div>
-        </div>
+<div class="card">
+<form id="form" class="controls" onsubmit="return false;">
+<input id="addr" type="text" placeholder="Enter wallet address (0x...)" style="flex:1"/>
+<select id="chain" style="width:160px">
+<option value="ethereum">Ethereum</option>
+<option value="base">Base</option>
+<option value="polygon">Polygon</option>
+<option value="arbitrum">Arbitrum</option>
+</select>
+<button id="btn" class="primary">Check Wallet</button>
+</form>
 
-        <div style="margin-top:12px">
-          <div class="small muted">ETH Balance</div>
-          <div style="display:flex;align-items:center;justify-content:space-between;margin-top:8px">
-            <div><strong id="eth_amt">—</strong> <span class="muted">ETH</span></div>
-            <div class="muted" id="eth_usd">—</div>
-          </div>
-          <div style="margin-top:12px">
-            <div class="small muted">Stablecoins / Top Tokens</div>
-            <ul id="stables" class="list"></ul>
-          </div>
-          <canvas id="pieChart" width="400" height="200"></canvas>
-        </div>
-        <div style="margin-top:12px">
-          <div class="bar" aria-hidden><i id="prog"></i></div>
-        </div>
-      </div>
-
-      <div id="details" class="card" style="margin-top:12px;display:none">
-        <h3 style="margin:0 0 10px 0">Details</h3>
-        <div class="small muted">ENS</div>
-        <div id="ens_name" style="margin:8px 0">—</div>
-        <div class="small muted">Twitter</div>
-        <div id="twitter" style="margin:8px 0">—</div>
-        <div class="small muted">Arkham</div>
-        <div id="arkham" style="margin:8px 0">—</div>
-      </div>
-    </div>
-
-    <aside class="rightcol">
-      <div class="card">
-        <div style="display:flex;justify-content:space-between;align-items:center">
-          <div>
-            <div class="small muted">Network</div>
-            <div id="net_label">—</div>
-          </div>
-          <div style="text-align:right">
-            <div class="small muted">Provider</div>
-            <div class="small">Public RPC</div>
-          </div>
-        </div>
-
-        <hr style="margin:12px 0;border:none;border-top:1px solid rgba(255,255,255,0.02)" />
-        <div class="notice">This app runs client-side in your browser. No API keys required.</div>
-        <footer class="small">Save as <code>index.html</code> & host on GitHub Pages.</footer>
-      </div>
-    </aside>
-  </div>
+<div class="grid">
+<div>
+<div id="summary" class="card" style="margin-top:14px;">
+<div class="metric">
+<div>
+<div class="small">Portfolio (approx)</div>
+<div class="big" id="pv">—</div>
+</div>
+<div style="text-align:right">
+<div class="sub" id="addr_short">—</div>
+</div>
 </div>
 
-  </div>  <script>
-  (function(){
-    const RPCS = {ethereum:'https://cloudflare-eth.com', base:'https://base-rpc.publicnode.com'};
-    const STABLES = {ethereum:{'0xA0b86991C6218b36c1d19D4a2e9Eb0cE3606eB48':'usd-coin','0xdAC17F958D2ee523a2206206994597C13D831ec7':'tether','0x6B175474E89094C44Da98b954EedeAC495271d0F':'dai'},base:{'0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913':'usd-coin'}};
-    const ERC20_ABI = ['function balanceOf(address) view returns (uint256)','function decimals() view returns (uint8)','function symbol() view returns (string)'];
-    const ethers = window.ethers;
-    const $ = id => document.getElementById(id);
+<div style="margin-top:12px">
+<div class="small">ETH Balance</div>
+<div style="display:flex;justify-content:space-between;margin-top:8px">
+<div><strong id="eth_amt">—</strong> ETH</div>
+<div id="eth_usd">— USD</div>
+</div>
 
-    let pieChart = null;
-    function renderPie(tokens){
-      const ctx = $('pieChart').getContext('2d');
-      if(pieChart) pieChart.destroy();
-      pieChart = new Chart(ctx, {type:'pie',data:{labels:tokens.map(t=>t.symbol),datasets:[{data:tokens.map(t=>t.usd),backgroundColor:tokens.map((_,i)=>`hsl(${i*50 % 360},70%,50%)`)}]},options:{plugins:{legend:{position:'bottom'}}}});
-    }
+<div class="small" style="margin-top:12px">Top Tokens</div>
+<ul id="tokens" class="list"></ul>
+<canvas id="pieChart" width="400" height="200"></canvas>
 
-    function toggleTheme(){
-      const theme = document.body.getAttribute('data-theme');
-      document.body.setAttribute('data-theme',theme==='dark'?'light':'dark');
-    }
+<div class="small" style="margin-top:16px">ENS / Social (placeholder)</div>
+<ul class="list">
+<li>ENS: <span id="ens">—</span></li>
+<li>Twitter: <span id="twitter">—</span></li>
+<li>Arkham: <span id="arkham">—</span></li>
+</ul>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
 
-    function shortAddr(a){return a.slice(0,6)+'...'+a.slice(-4)}
+<script>
+const $ = id=>document.getElementById(id);
+let pieChart=null;
 
-    async function fetchPriceETH(){try{const r=await fetch('https://api.coingecko.com/api/v3/simple/price?ids=ethereum&vs_currencies=usd');const j=await r.json();return j.ethereum.usd}catch(e){return null}}
-    async function fetchTokenPrices(platform,contracts){try{const url=`https://api.coingecko.com/api/v3/simple/token_price/${platform}?contract_addresses=${contracts.join(',')}&vs_currencies=usd`;const r=await fetch(url);return await r.json()}catch(e){return {}}}
+function toggleTheme(){
+const theme=document.body.getAttribute('data-theme');
+document.body.setAttribute('data-theme',theme==='dark'?'light':'dark');
+}
 
-    async function runCheck(){
-      const raw = $('addr').value.trim();
-      if(!raw){alert('Enter address or ENS');return}
-      $('btn').disabled=true;$('btn').textContent='Checking...';$('prog').style.width='6%';
-      const chain = $('chain').value;$('net_label').textContent=chain.toUpperCase();
-      try
+const rpcUrls={
+ethereum:'https://cloudflare-eth.com',
+base:'https://base-rpc.publicnode.com',
+polygon:'https://polygon-rpc.com',
+arbitrum:'https://arb1.arbitrum.io/rpc'
+};
+
+const coingeckoIds={
+ethereum:'ethereum',
+polygon:'matic-network',
+arbitrum:'ethereum', // for demo
+base:'ethereum'
+};
+
+const topTokens={
+ethereum:[
+{address:'0xA0b86991C6218b36c1d19D4a2e9Eb0cE3606eB48',symbol:'USDC'},
+{address:'0xdAC17F958D2ee523a2206206994597C13D831ec7',symbol:'USDT'},
+{address:'0x6B175474E89094C44Da98b954EedeAC495271d0F',symbol:'DAI'}
+],
+base:[
+{address:'0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913',symbol:'USDC'}
+],
+polygon:[
+{address:'0x2791Bca1f2de4661ED88A30C99A7a9449Aa84174',symbol:'USDC'}
+],
+arbitrum:[
+{address:'0xFF970A61A04b1cA14834A43f5dE4533eBDDB5CC8',symbol:'USDC'}
+]
+};
+
+async function fetchWalletInfo(){
+const addr=$('addr').value.trim();
+const chain=$('chain').value;
+if(!addr){alert('Enter a wallet address');return;}
+$('btn').disabled=true;$('btn').textContent='Checking...';
+const provider=new ethers.JsonRpcProvider(rpcUrls[chain]);
+try{
+// ETH balance
+const balance=await provider.getBalance(addr);
+const eth=Number(ethers.formatEther(balance));
+$('eth_amt').textContent=eth.toFixed(4);
+
+// CoinGecko price
+const priceResp=await fetch(`https://api.coingecko.com/api/v3/simple/price?ids=${coingeckoIds[chain]}&vs_currencies=usd`);
+const priceJson=await priceResp.json();
+const usd=eth*priceJson[coingeckoIds[chain]].usd;
+$('eth_usd').textContent='$'+usd.toFixed(2);
+$('pv').textContent='$'+usd.toFixed(2);
+$('addr_short').textContent=addr.slice(0,6)+'...'+addr.slice(-4);
+
+// Fetch tokens
+const erc20Abi=['function balanceOf(address) view returns (uint256)','function decimals() view returns (uint8)','function symbol() view returns (string)'];
+let tokens=[];
+for(const t of topTokens[chain]){
+try{
+const c=new ethers.Contract(t.address,erc20Abi,provider);
+const amt=await c.balanceOf(addr);
+const dec=await c.decimals();
+const amount=parseFloat(ethers.formatUnits(amt,dec));
+tokens.push({symbol:t.symbol,amount:amount,usd:amount}); // demo, USD ~ amount
+}catch(e){console.error(e);}
+}
+
+// Render token list
+const ul=$('tokens');ul.innerHTML='';
+tokens.forEach(t=>{ul.innerHTML+='<li>'+t.symbol+'<span>$'+t.usd.toFixed(2)+'</span></li>'});
+
+// Pie chart
+const ctx=$('pieChart').getContext('2d');
+if(pieChart) pieChart.destroy();
+pieChart=new Chart(ctx,{type:'pie',data:{labels:tokens.map(t=>t.symbol),datasets:[{data:tokens.map(t=>t.usd),backgroundColor:['#7c3aed','#06b6d4','#facc15','#f43f5e','#10b981']}]},options:{plugins:{legend:{position:'bottom'}}}});
+
+// ENS & social placeholders
+try{
+const ensName=await provider.lookupAddress(addr);
+$('ens').textContent=ensName?ensName:'—';
+$('twitter').textContent='—';
+$('arkham').textContent='—';
+}catch(e){$('ens').textContent='—';$('twitter').textContent='—';$('arkham').textContent='—';}
+
+}catch(e){alert('Error fetching wallet info');console.error(e);}
+$('btn').disabled=false;$('btn').textContent='Check Wallet';
+}
+
+$('btn').addEventListener('click',fetchWalletInfo);
+</script>
+</body>
+</html>
